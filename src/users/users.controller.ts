@@ -8,39 +8,49 @@ import {
   Param,
   Body,
 } from '@nestjs/common';
+import { UsersService } from './users.service';
 
 @Controller('users')
-
-// this are the routes wwe want to create
 export class UsersController {
+  constructor(private readonly usersService: UsersService) {}
+
   @Get() //  GET /users
-  findAll(@Query('role') role?: 'ADMIN' | 'INTERN' | 'SENIORMAN') {
-    return [
-      {
-        role,
-      },
-    ];
+  findAll(@Query('role') role?: 'ADMIN' | 'INTERN' | 'ENGINEER') {
+    return this.usersService.findAll(role);
   }
 
   @Get(':id') //  GET /users/:id
   findOne(@Param('id') id: string) {
-    return [id];
+    return this.usersService.findOne(+id);
   }
 
   @Post() //  POST /users
-  create(@Body() users: {}) {
-    return { users };
+  create(
+    @Body()
+    user: {
+      name: string;
+      email: string;
+      role: 'ENGINEER' | 'INTERN' | 'ADMIN';
+    },
+  ) {
+    return this.usersService.create(user);
   }
 
   @Patch(':id') //  Patch /users/:id
-  update(@Param('id') id: string, @Body() userUpdate: {}) {
-    return { id, ...userUpdate };
+  update(
+    @Param('id') id: string,
+    @Body()
+    updatedUser: {
+      name?: string;
+      email?: string;
+      role?: 'ENGINEER' | 'INTERN' | 'ADMIN';
+    },
+  ) {
+    return this.usersService.update(+id, updatedUser);
   }
 
   @Delete(':id')
   delete(@Param('id') id: string) {
-    return {
-      id,
-    };
+    return this.usersService.delete(+id);
   }
 }
